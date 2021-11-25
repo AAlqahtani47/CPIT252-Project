@@ -5,46 +5,171 @@ ID: 1846618
 package project252;
 
 import java.sql.*;
+import java.util.Scanner;
 
 public class Project252 {
 
     public static void main(String[] args) throws SQLException {
-        
-        //make an instance using getInstance method instead of the constructor
-        Connection conn = DBConnection.getDBInstance();
-        Connection conn2 = DBConnection.getDBInstance();
-        
-        //code for interacting with the database using statements
-        Statement stat = conn.createStatement();
-        
-        /* *these next lines were made for testing and have been commented, so that its not excuted each time the program is run
-        stat.execute("create table if not exists employees (ID int primary key unique, name char(25), salary double)");
-        stat.execute("insert into employees () values (1847446,'Abdullah Ibrahim', 7765.74)");
-        stat.execute("insert into employees () values (1846618,'ABDULRAHMAN ALQAHTANI', 8565.74)");
-        stat.execute("insert into employees (ID, name) values (1846564,'NADER ALQAHTANI')");
-        stat.execute("UPDATE employees SET salary = 4567.7 WHERE name like 'nader%';");
-        stat.execute("drop table employees");
-         */
-        
-        // Check if it is singleton
-        if (conn == conn2) {
-            System.out.println("Singleton :) \n");
-        } else {
-            System.out.println("NO :( \n");
-        }
+        Scanner sc = new Scanner(System.in);
 
-        //Get all employees information from table employees in database hoteldb
-        try {
-            String query = "select * from employees";
-            stat = conn.createStatement();
-            ResultSet rs = stat.executeQuery(query);
-            while (rs.next()) {
-                System.out.println(rs.getInt(1) + "  " + rs.getString(2) + "  " + rs.getDouble(3));
+        Connection conn = DBConnection.getDBInstance();
+        CommandExecutor cExecutor = new CommandExecutor();
+        Statement stat = conn.createStatement();
+
+        String choice = menu1(sc, cExecutor);
+
+    }
+
+    
+    
+    
+    public static String menu1(Scanner sc, CommandExecutor cExecutor) {
+        Employees emp = new Employees();
+        BuffetMenu bm = new BuffetMenu();
+        Residents rsd = new Residents();
+
+        int id;
+        String name;
+        double salary;
+        String dept;
+        int days;
+        int quantity;
+        String ch;
+        int choice;
+
+        System.out.println("************** Welcome To The Hotel Management System **************");
+        System.out.println("Choose a service by pressing the corresponding number: ");
+        System.out.println("1. Deleting");
+        System.out.println("2. Inserting");
+        System.out.println("3. Updating");
+        System.out.println("4. Exit");
+        System.out.print("Choice: ");
+        choice = Integer.parseInt(sc.nextLine());
+
+        if (choice == 1) {
+
+            System.out.println("Choose a table to delete from by pressing the corresponding number: ");
+            ch = menu2(sc);
+
+            if (ch.equalsIgnoreCase("employees")) {
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                emp.setName(name);
+                cExecutor.deleteEmployee();
+            
+            } else if (ch.equalsIgnoreCase("residents")) {
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                rsd.setName(name);
+                cExecutor.deleteResidents();
+           
+            } else if (ch.equalsIgnoreCase("buffet menu")) {
+                System.out.print("Please enter menu item name:");
+                name = sc.next();
+                bm.setName(name);
+                cExecutor.deleteMenuItem();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } else if (choice == 2) {
+
+            System.out.println("Choose a table to insert to by pressing the corresponding number: ");
+            ch = menu2(sc);
+            System.out.println("****************************");
+            if (ch.equalsIgnoreCase("employees")) {
+                System.out.print("Please enter 7-digit employee ID:");
+                id = sc.nextInt();
+                emp.setId(id);
+                
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                emp.setName(name);
+                System.out.print("\nPlease enter employee salary: ");
+                salary = sc.nextDouble();
+                emp.setSalary(salary);
+                System.out.print("\nPlease enter employee department: ");
+                dept = sc.next();
+                emp.setDepartment(dept);
+                cExecutor.insertEmployee();
+                
+            } else if (ch.equalsIgnoreCase("residents")) {
+                System.out.print("Please enter resident ID:");
+                id = sc.nextInt();
+                rsd.setId(id);
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                rsd.setName(name);
+                System.out.print("\nPlease enter resident days of reservation: ");
+                days = sc.nextInt();
+                rsd.setDaysOfReservation(days);
+                cExecutor.insertResidents();
+                
+            } else if (ch.equalsIgnoreCase("buffet menu")) {
+                System.out.print("Please enter menu item name:");
+                name = sc.next();
+                bm.setName(name);
+                System.out.print("\nPlease enter quantity:");
+                quantity = sc.nextInt();
+                bm.setQuantity(quantity);
+                cExecutor.insertMenuItem();
+            }
+
+        } else if (choice == 3) {
+ 
+            System.out.println("Choose a table to update by pressing the corresponding number: ");
+            ch = menu2(sc);
+
+            if (ch.equalsIgnoreCase("employees")) {
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                emp.setName(name);
+                System.out.print("\nPlease enter new employee salary: ");
+                salary = sc.nextDouble();
+                emp.setSalary(salary);
+                cExecutor.updateEmployee();
+            
+            } else if (ch.equalsIgnoreCase("residents")) {
+                System.out.print("\nPlease enter new resident days of reservation: ");
+                days = sc.nextInt();
+                rsd.setDaysOfReservation(days);
+                System.out.print("\nPlease enter first and last name:");
+                name = sc.next();
+                emp.setName(name);
+                cExecutor.updateResidents();
+            } else if (ch.equalsIgnoreCase("buffet menu")) {
+                System.out.print("\nPlease enter new quantity:");
+                quantity = sc.nextInt();
+                bm.setQuantity(quantity);
+                System.out.print("Please enter menu item name:");
+                name = sc.next();
+                bm.setName(name);
+                cExecutor.updateMenuItem();
+            }
+
+        } else if (choice == 4) {
+            System.out.println("************** Thank You For Using Hotel Management System **************");
+            System.exit(0);
         }
+        return null;
+    }
+
+    public static String menu2(Scanner sc) {
+        System.out.println("****************************");
+        System.out.println("1. Employees");
+        System.out.println("2. Residents");
+        System.out.println("3. Buffet Menu");
+        System.out.print("Choice: ");
+        int choice = 0;
         
+        choice = Integer.parseInt(sc.nextLine());;
+        if (choice == 1) {
+            return "employees";
+        } else if (choice == 2) {
+            return "residents";
+        } else if (choice == 3) {
+            return "buffet menu";
+        }
+        return null;
+
     }
 
 }
